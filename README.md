@@ -1,0 +1,2 @@
+# pw
+A simple wrapper for package managers
