@@ -81,11 +81,11 @@ esac
 
 case "$PW_PACKAGE_MANAGER" in
 apt)
-    pw_update()        { apt-get update; }
-    pw_upgrade()       { apt-get update; apt-get upgrade; }
     pw_install()       { apt-get install --no-install-recommends "$@"; }
+    pw_remove()        { apt-get remove "$@"; }
+    pw_update()        { apt-get update; }
+    pw_upgrade()       { apt-get update && apt-get upgrade; }
     pw_clean()         { apt-get clean; }
-    pw_remove()        { apt-get --purge purge "$@"; }
 
     pw_search()        { apt-cache search --names-only "$@"; }
     pw_search_desc()   { apt-cache search "$@"; }
@@ -95,6 +95,32 @@ apt)
     pw_builddep()      { apt-get build-dep "$@"; }
     pw_download()      { apt-get install --download-only "$@"; }
     ;;
+
+homebrew)
+    pw_install()       { brew install "$@"; }
+    pw_remove()        { brew uninstall "$@"; }
+    pw_update()        { brew update; }
+    pw_upgrade()       { brew upgrade "$@";  }
+
+    pw_search()        { brew search --name "$@"; }
+    pw_search_desc()   { brew search --description "$@"; }
+    ;;
+
+zypper)
+    pw_install()       { zypper install "$@"; }
+    pw_remove()        { zypper remove "$@"; }
+    pw_update()        { zypper refresh; }
+    pw_upgrade()       { zypper update; }
+    pw_clean()         { zypper clean; }
+
+    pw_search()        { zypper search "$@"; }
+    pw_search_desc()   { zypper search "$@"; }
+
+    pw_source()        { zypper source-install "$@"; }
+    pw_builddep()      { zypper source-install -d "$@"; }
+    pw_download()      { zypper --download-only "$@"; }
+    ;;
+
 
 *)
     echo "Error: 'PW_PACKAGE_MANAGER' is not supported yet!"
