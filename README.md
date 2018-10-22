@@ -39,4 +39,4 @@ What is the benefit of doing so, instead of using apt directly? For me the
 benefits are:
 * when I am on system with another package manager (yum, homebrew, zypper),
 the above commands also work
-* command like `pw-own /usr/bin/pinky` is easier to remember than `dpkg -S /usr/bin/pinky`
+* command like `pw-own /usr/bin/pinky` (which package owns file `/usr/bin/pinky`?) is easier to remember than `dpkg -S /usr/bin/pinky` (unless you like to read `man dpkg`)
