@@ -9,56 +9,81 @@ function set_pw_platform() {
   fi
 }
 
-set_pw_platform   /usr/bin/yum          rpm    yum
-set_pw_platform   /usr/bin/apt-get      deb    apt
-set_pw_platform   /usr/local/bin/brew   none   homebrew
+# set_pw_platform   <path> <package-format> <package-manager>
+# derived from https://github.com/ansible/ansible/blob/devel/lib/ansible/module_utils/facts/system/pkg_mgr.py
 
-echo $PW_PACKAGE_FORMAT
-echo $PW_PACKAGE_MANAGER
+set_pw_platform /usr/bin/yum           rpm     yum
+set_pw_platform /usr/bin/dnf           rpm     dnf
+set_pw_platform /usr/bin/apt-get       deb     apt
+set_pw_platform /usr/bin/zypper        rpm     zypper
+# set_pw_platform /usr/sbin/urpmi        rpm     urpmi
+# set_pw_platform /usr/bin/pacman        not_set pacman
+# set_pw_platform /bin/opkg              not_set opkg
+# set_pw_platform /usr/pkg/bin/pkgin     not_set pkgin
+# set_pw_platform /opt/local/bin/pkgin   not_set pkgin
+# set_pw_platform /opt/tools/bin/pkgin   not_set pkgin
+# set_pw_platform /opt/local/bin/port    not_set macports
+set_pw_platform /usr/local/bin/brew    not_set homebrew
+# set_pw_platform /sbin/apk              not_set apk
+# set_pw_platform /usr/sbin/pkg          not_set pkgng
+# set_pw_platform /usr/sbin/swlist       not_set HP-UX
+# set_pw_platform /usr/bin/emerge        not_set portage
+# set_pw_platform /usr/sbin/pkgadd       not_set svr4pkg
+# set_pw_platform /usr/bin/pkg           not_set pkg5
+# set_pw_platform /usr/bin/xbps-install  not_set xbps
+# set_pw_platform /usr/local/sbin/pkg    not_set pkgng
+# set_pw_platform /usr/bin/swupd         not_set swupd
+# set_pw_platform /usr/sbin/sorcery      not_set sorcery
+# set_pw_platform /usr/bin/rpm-ostree    not_set atomic_container
+
 
 # some common and fallback utils:
-pw_install()           { echo "$FUNCNAME not available!"; exit 1; }
-pw_clean()             { echo "$FUNCNAME not available!"; exit 1; }
-pw_remove()            { echo "$FUNCNAME not available!"; exit 1; }
+func_undefined()  { echo "$1" is undefined; exit 1; }
 
-pw_search()            { echo "$FUNCNAME not available!"; exit 1; }
-pw_search_desc()       { echo "$FUNCNAME not available!"; exit 1; }
-pw_search_file()       { echo "$FUNCNAME not available!"; exit 1; }
+pw_install()      { func_undefined "$FUNCNAME"; }
+pw_remove()       { func_undefined "$FUNCNAME"; }
+pw_clean()        { func_undefined "$FUNCNAME"; }
 
-pw_update()            { echo "$FUNCNAME not available!"; exit 1; }
-pw_upgrade()           { echo "$FUNCNAME not available!"; exit 1; }
+pw_search()       { func_undefined "$FUNCNAME"; }
+pw_search_desc()  { func_undefined "$FUNCNAME"; }
+pw_search_file()  { func_undefined "$FUNCNAME"; }
 
-pw_source()            { echo "$FUNCNAME not available!"; exit 1; }
-pw_builddep()          { echo "$FUNCNAME not available!"; exit 1; }
-pw_download()          { echo "$FUNCNAME not available!"; exit 1; }
+pw_update()       { func_undefined "$FUNCNAME"; }
+pw_upgrade()      { func_undefined "$FUNCNAME"; }
 
-pw_info()              { echo "$FUNCNAME not available!"; exit 1; }
-pw_check()             { echo "$FUNCNAME not available!"; exit 1; }
-pw_file()              { echo "$FUNCNAME not available!"; exit 1; }
-pw_list()              { echo "$FUNCNAME not available!"; exit 1; }
-pw_own()               { echo "$FUNCNAME not available!"; exit 1; }
+pw_source()       { func_undefined "$FUNCNAME"; }
+pw_builddep()     { func_undefined "$FUNCNAME"; }
+pw_download()     { func_undefined "$FUNCNAME"; }
+
+pw_info()         { func_undefined "$FUNCNAME"; }
+pw_check()        { func_undefined "$FUNCNAME"; }
+pw_file()         { func_undefined "$FUNCNAME"; }
+pw_list()         { func_undefined "$FUNCNAME"; }
+pw_own()          { func_undefined "$FUNCNAME"; }
 
 case "$PW_PACKAGE_FORMAT" in
 deb)
-    pw_info()          { dpkg -p "$@"; }
-    pw_check()         { dpkg -s "$@"; }
-    pw_file()          { dpkg -L "$@"; }
-    pw_own()           { dpkg -S "$@"; }
+    pw_list()   { dpkg-query -f '${binary:Package}\n' -W; }
+    pw_info()   { dpkg -p "$@"; }
+    pw_check()  { dpkg -s "$@"; }
+    pw_file()   { dpkg -L "$@"; }
+    pw_own()    { dpkg -S "$@"; }
     ;;
 
 rpm)
-    pw_info()          { rpm -qi "$@"; }
-    pw_check()         { rpm -q "$@"; }
-    pw_file()          { rpm -ql "$@"; }
-    pw_list()          { rpm -qa; }
-    pw_own()           { rpm -qf "$@"; }
+    pw_info()   { rpm -qi "$@";  }
+    pw_check()  { rpm -q "$@";   }
+    pw_file()   { rpm -ql "$@";  }
+    pw_list()   { rpm -qa;       }
+    pw_own()    { rpm -qf "$@";  }
     ;;
 esac
 
 case "$PW_PACKAGE_MANAGER" in
 apt)
-    pw_list()          { apt list --installed "$@"; }
-    pw_install()       { apt-get install "$@"; pw_clean; }
+    pw_update()        { apt-get update; }
+    pw_upgrade()       { apt-get update; apt-get upgrade; }
+    pw_install()       { apt-get install --no-install-recommends "$@"; }
     pw_clean()         { apt-get clean; }
     pw_remove()        { apt-get --purge purge "$@"; }
 
@@ -66,18 +91,9 @@ apt)
     pw_search_desc()   { apt-cache search "$@"; }
     pw_search_file()   { apt-file search "$@"; }
 
-    # pw_update()        { apt-get update; touch /var/lib/apt/update_success; }
-    # pw_upgrade()       { pw_update; apt-get upgrade; pw_clean; }
-
     pw_source()        { apt-get source "$@"; }
     pw_builddep()      { apt-get build-dep "$@"; }
-    # pw_download()    is not implemented
-
-    pw_info()          { apt-cache show "$@"; }
-    # pw_check()       uses fallback
-    # pw_file()        uses fallback
-    # pw_list()        uses fallback
-    # pw_own()         uses fallback
+    pw_download()      { apt-get install --download-only "$@"; }
     ;;
 
 *)
