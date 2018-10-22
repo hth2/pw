@@ -41,4 +41,7 @@ benefits are:
 the above commands also work.
 * Commands are easy to remember thanks to consistent, sensible naming: command like `pw-own /usr/bin/pinky` (which package owns file `/usr/bin/pinky`?) is easier to remember than `dpkg -S /usr/bin/pinky` (unless you like to read `man dpkg`)
 * Commands are easy to type thanks to out-of-the-box auto-completion; no need to mess around with my bash/zsh setup. Just type e.g. `pw-<Tab>` to see all commands.
-* Easy installation, so that when I need `pw`, it can by installed with a copy-and-paste.
+* Easy installation, so that when I need `pw`, it can by installed with a quick copy-and-paste action
+
+# Links
+* https://wiki.archlinux.org/index.php/Pacman/Rosetta
