@@ -41,5 +41,6 @@ the above commands also work.
 * Commands are easy to type thanks to out-of-the-box auto-completion; no need to mess around with my bash/zsh setup. Just type e.g. `pw-<Tab>` to see all commands.
 * Easy installation, so that when I need `pw`, it can by installed with a quick copy-and-paste action. I find this very convenient whenever I am inside a VPS or docker container and need to do something quickly.
 
-# Links
+## Links
 * https://wiki.archlinux.org/index.php/Pacman/Rosetta
+* original version: https://www.howtoforge.com/pkgwatch-a-package-management-wrapper
