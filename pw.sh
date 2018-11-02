@@ -104,6 +104,10 @@ homebrew)
 
     pw_search()        { brew search --name "$@"; }
     pw_search_desc()   { brew search --description "$@"; }
+
+    pw_info()          { brew info "$@"; }
+    pw_file()          { brew list --verbose "$@"; }
+    pw_list()          { brew list; }
     ;;
 
 zypper)
@@ -129,11 +133,14 @@ esac
 
 
 alias pw-install='pw_install'
+alias pw-inst='pw_install'
 alias pw-remove='pw_remove'
+alias pw-rm='pw_remove'
 alias pw-check='pw_check'
 alias pw-file='pw_file'
 alias pw-info='pw_info'
 alias pw-list='pw_list'
+alias pw-ls='pw_list'
 alias pw-own='pw_own'
 alias pw-search='pw_search'
 alias pw-search_desc='pw_search_desc'
