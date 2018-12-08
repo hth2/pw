@@ -60,6 +60,7 @@ pw_check()        { func_undefined "$FUNCNAME"; }
 pw_file()         { func_undefined "$FUNCNAME"; }
 pw_list()         { func_undefined "$FUNCNAME"; }
 pw_own()          { func_undefined "$FUNCNAME"; }
+pw_versions()     { func_undefined "$FUNCNAME"; }
 
 case "$PW_PACKAGE_FORMAT" in
 deb)
@@ -86,6 +87,7 @@ apt)
     pw_update()        { apt-get update; }
     pw_upgrade()       { apt-get update && apt-get upgrade; }
     pw_clean()         { apt-get clean; }
+    pkg_info()         { apt-cache show "$@"; }
 
     pw_search()        { apt-cache search --names-only "$@"; }
     pw_search_desc()   { apt-cache search "$@"; }
@@ -94,6 +96,7 @@ apt)
     pw_source()        { apt-get source "$@"; }
     pw_builddep()      { apt-get build-dep "$@"; }
     pw_download()      { apt-get install --download-only "$@"; }
+    pw_version()       { apt-cache policy "$@"; }
     ;;
 
 homebrew)
@@ -133,14 +136,11 @@ esac
 
 
 alias pw-install='pw_install'
-alias pw-inst='pw_install'
 alias pw-remove='pw_remove'
-alias pw-rm='pw_remove'
 alias pw-check='pw_check'
 alias pw-file='pw_file'
 alias pw-info='pw_info'
 alias pw-list='pw_list'
-alias pw-ls='pw_list'
 alias pw-own='pw_own'
 alias pw-search='pw_search'
 alias pw-search_desc='pw_search_desc'
@@ -149,3 +149,4 @@ alias pw-update='pw_update'
 alias pw-upgrade='pw_upgrade'
 alias pw-source='pw_source'
 alias pw-builddep='pw_builddep'
+alias pw-versions='pw_versions'
