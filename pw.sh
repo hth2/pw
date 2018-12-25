@@ -37,6 +37,10 @@ set_pw_platform /usr/local/bin/brew    not_set homebrew
 # set_pw_platform /usr/bin/rpm-ostree    not_set atomic_container
 
 
+pw_self_update() {
+  curl -L https://raw.githubusercontent.com/hth2/pw/master/pw.sh -o /usr/local/bin/pw.sh
+}
+
 # some common and fallback utils:
 func_undefined()  { echo "$1" is undefined; exit 1; }
 
@@ -61,6 +65,7 @@ pw_file()         { func_undefined "$FUNCNAME"; }
 pw_list()         { func_undefined "$FUNCNAME"; }
 pw_own()          { func_undefined "$FUNCNAME"; }
 pw_versions()     { func_undefined "$FUNCNAME"; }
+
 
 case "$PW_PACKAGE_FORMAT" in
 deb)
@@ -89,7 +94,8 @@ apt)
     pw_clean()         { apt-get clean; }
     pkg_info()         { apt-cache show "$@"; }
 
-    pw_search()        { apt-cache search --names-only "$@"; }
+    # pw_search()        { apt-cache search --names-only "$@"; }
+    pw_search()        { apt search "$@"; }
     pw_search_desc()   { apt-cache search "$@"; }
     pw_search_file()   { apt-file search "$@"; }
 
@@ -135,6 +141,7 @@ zypper)
 esac
 
 
+alias pw-self-update='pw_self_update'
 alias pw-install='pw_install'
 alias pw-remove='pw_remove'
 alias pw-check='pw_check'
@@ -150,3 +157,4 @@ alias pw-upgrade='pw_upgrade'
 alias pw-source='pw_source'
 alias pw-builddep='pw_builddep'
 alias pw-versions='pw_versions'
+
