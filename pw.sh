@@ -37,11 +37,7 @@ set_pw_platform /usr/local/bin/brew    not_set homebrew
 # set_pw_platform /usr/bin/rpm-ostree    not_set atomic_container
 
 # use sudo if available
-if [[ command -v sudo >/dev/null 2>&1 ]]; then
-  SUDO="sudo "
-else
-  SUDO=""
-fi
+SUDO=$(command -v sudo 2>/dev/null)
 
 
 pw_self_update() {
@@ -100,6 +96,7 @@ apt)
     pw_remove()        { $SUDO apt-get --purge purge "$@"; }
     pw_update()        { $SUDO apt-get update; }
     pw_upgrade()       { $SUDO apt-get update && apt-get dist-upgrade; }
+    # ref: https://askubuntu.com/questions/194651/why-use-apt-get-upgrade-instead-of-apt-get-dist-upgrade
     pw_clean()         { $SUDO apt-get clean; }
     pw_info()          { apt-cache show "$@"; }
 
