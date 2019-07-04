@@ -3,7 +3,7 @@
 # PM detection (from lib/ansible/module_utils/facts/system/pkg_mgr.py)
 # arg: <path> <format> <manager>
 function set_pw_platform() {
-  if [ -x "$1" ]; then
+  if [[ -x "$1" ]]; then
     PW_PACKAGE_FORMAT="$2"
     PW_PACKAGE_MANAGER="$3"
   fi
@@ -36,9 +36,18 @@ set_pw_platform /usr/local/bin/brew    not_set homebrew
 # set_pw_platform /usr/sbin/sorcery      not_set sorcery
 # set_pw_platform /usr/bin/rpm-ostree    not_set atomic_container
 
+# use sudo if available
+if [[ command -v sudo >/dev/null 2>&1 ]]; then
+  SUDO="sudo "
+else
+  SUDO=""
+fi
+
 
 pw_self_update() {
+  set -x
   curl -L https://raw.githubusercontent.com/hth2/pw/master/pw.sh -o /usr/local/bin/pw.sh
+  set +x
 }
 
 # some common and fallback utils:
@@ -87,12 +96,12 @@ esac
 
 case "$PW_PACKAGE_MANAGER" in
 apt)
-    pw_install()       { apt-get install --no-install-recommends "$@"; }
-    pw_remove()        { apt-get remove "$@"; }
-    pw_update()        { apt-get update; }
-    pw_upgrade()       { apt-get update && apt-get upgrade; }
-    pw_clean()         { apt-get clean; }
-    pkg_info()         { apt-cache show "$@"; }
+    pw_install()       { $SUDO apt-get install --no-install-recommends "$@"; }
+    pw_remove()        { $SUDO apt-get --purge purge "$@"; }
+    pw_update()        { $SUDO apt-get update; }
+    pw_upgrade()       { $SUDO apt-get update && apt-get dist-upgrade; }
+    pw_clean()         { $SUDO apt-get clean; }
+    pw_info()          { apt-cache show "$@"; }
 
     # pw_search()        { apt-cache search --names-only "$@"; }
     pw_search()        { apt search "$@"; }
