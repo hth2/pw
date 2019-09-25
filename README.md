@@ -44,3 +44,4 @@ the above commands also work.
 ## Links
 * https://wiki.archlinux.org/index.php/Pacman/Rosetta
 * original version: https://www.howtoforge.com/pkgwatch-a-package-management-wrapper
+* https://github.com/icy/pacapt

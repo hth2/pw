@@ -1,4 +1,8 @@
 # this file should be sourced from .bashrc or its equvivalent
+# ref:
+#   https://wiki.archlinux.org/index.php/Pacman/Rosetta
+#   https://github.com/icy/pacapt
+
 
 # PM detection (from lib/ansible/module_utils/facts/system/pkg_mgr.py)
 # arg: <path> <format> <manager>
@@ -46,9 +50,7 @@ run_cmd() {
 
 
 pw_self_update() {
-  set -x
-  run_cmd $SUDO curl -L https://raw.githubusercontent.com/hth2/pw/master/pw.sh -o "$0"
-  set +x
+  run_cmd curl -L https://raw.githubusercontent.com/hth2/pw/master/pw.sh -o "$0"
 }
 
 # some common and fallback utils:
@@ -56,6 +58,7 @@ func_undefined()  { echo "$1" is undefined; exit 1; }
 
 pw_install()      { func_undefined "${FUNCNAME[0]}"; } # DONE
 pw_remove()       { func_undefined "${FUNCNAME[0]}"; }
+pw_purge()        { func_undefined "${FUNCNAME[0]}"; }
 pw_clean()        { func_undefined "${FUNCNAME[0]}"; }
 
 pw_search()       { func_undefined "${FUNCNAME[0]}"; }
@@ -70,7 +73,6 @@ pw_builddep()     { func_undefined "${FUNCNAME[0]}"; }
 pw_download()     { func_undefined "${FUNCNAME[0]}"; }
 
 pw_info()         { func_undefined "${FUNCNAME[0]}"; }
-pw_check()        { func_undefined "${FUNCNAME[0]}"; }
 pw_file()         { func_undefined "${FUNCNAME[0]}"; }
 pw_list()         { func_undefined "${FUNCNAME[0]}"; }
 pw_own()          { func_undefined "${FUNCNAME[0]}"; }
@@ -81,14 +83,12 @@ case "$PW_PACKAGE_FORMAT" in
 deb)
     pw_list()   { run_cmd dpkg-query -f '${binary:Package}\n' -W; }
     pw_info()   { run_cmd dpkg -p "$@"; }
-    pw_check()  { run_cmd dpkg -s "$@"; }
     pw_file()   { run_cmd dpkg -L "$@"; }
     pw_own()    { run_cmd dpkg -S "$@"; }
     ;;
 
 rpm)
     pw_info()   { run_cmd rpm -qi "$@";  }
-    pw_check()  { run_cmd rpm -q "$@";   }
     pw_file()   { run_cmd rpm -ql "$@";  }
     pw_list()   { run_cmd rpm -qa;       }
     pw_own()    { run_cmd rpm -qf "$@";  }
@@ -98,29 +98,29 @@ esac
 case "$PW_PACKAGE_MANAGER" in
 apt)
     pw_install()       { run_cmd $SUDO apt-get install --no-install-recommends "$@"; }
-    pw_remove()        { run_cmd $SUDO apt-get --purge purge "$@"; }
+    pw_remove()        { run_cmd $SUDO apt-get remove "$@"; }
+    pw_purge()         { run_cmd $SUDO apt-get --purge autoremove "$@"; }
     pw_update()        { run_cmd $SUDO apt-get update; }
     pw_upgrade()       { run_cmd $SUDO apt-get update && apt-get dist-upgrade; }
-    # ref: https://askubuntu.com/questions/194651/why-use-apt-get-upgrade-instead-of-apt-get-dist-upgrade
     pw_clean()         { run_cmd $SUDO apt-get clean; }
     pw_info()          { run_cmd apt-cache show "$@"; }
 
-    # pw_search()        { run_cmd apt-cache search --names-only "$@"; }
-    pw_search()        { run_cmd apt search "$@"; }
+    pw_search()        { run_cmd apt-cache search --names-only "$@"; }
     pw_search_desc()   { run_cmd apt-cache search "$@"; }
     pw_search_file()   { run_cmd apt-file search "$@"; }
 
     pw_source()        { run_cmd apt-get source "$@"; }
     pw_builddep()      { run_cmd apt-get build-dep "$@"; }
     pw_download()      { run_cmd apt-get install --download-only "$@"; }
-    pw_version()       { run_cmd apt-cache policy "$@"; }
+    pw_versions()      { run_cmd apt-cache policy "$@"; }
     ;;
 
 homebrew)
     pw_install()       { run_cmd brew install "$@"; }
-    pw_remove()        { run_cmd brew uninstall "$@"; }
+    pw_remove()        { run_cmd brew remove "$@"; }
     pw_update()        { run_cmd brew update; }
     pw_upgrade()       { run_cmd brew upgrade "$@";  }
+    pw_clean()         { run_cmd brew cleanup -s "$@";  }
 
     pw_search()        { run_cmd brew search --name "$@"; }
     pw_search_desc()   { run_cmd brew search --description "$@"; }
@@ -128,6 +128,8 @@ homebrew)
     pw_info()          { run_cmd brew info "$@"; }
     pw_file()          { run_cmd brew list --verbose "$@"; }
     pw_list()          { run_cmd run_cmd brew list; }
+    # https://stackoverflow.com/questions/19915683/how-to-find-package-for-installed-file-in-brew
+    pw_own()           { run_cmd greadlink -f "$@"; } 
     ;;
 
 zypper)
@@ -155,7 +157,7 @@ esac
 alias pw-self-update='pw_self_update'
 alias pw-install='pw_install'
 alias pw-remove='pw_remove'
-alias pw-check='pw_check'
+alias pw-purge='pw_purge'
 alias pw-file='pw_file'
 alias pw-info='pw_info'
 alias pw-list='pw_list'
@@ -168,4 +170,3 @@ alias pw-upgrade='pw_upgrade'
 alias pw-source='pw_source'
 alias pw-builddep='pw_builddep'
 alias pw-versions='pw_versions'
-
