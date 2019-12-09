@@ -8,7 +8,7 @@ a consistent interface.
 * as root:
 ```
 curl -L https://raw.githubusercontent.com/hth2/pw/master/pw.sh -o /usr/local/bin/pw.sh
-echo 'source /usr/local/bin/pw.sh' >> ~/.bashrc
+echo 'source /usr/local/bin/pw.sh' >> /etc/bash.bashrc
 ```
 * as regular user:
 ```
