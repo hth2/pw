@@ -1,8 +1,17 @@
-# this file should be sourced from .bashrc or its equvivalent
+# this file should be sourced from .bashrc or its equivalent
 # ref:
 #   https://wiki.archlinux.org/index.php/Pacman/Rosetta
 #   https://github.com/icy/pacapt
 
+# exit if current shell is not bash
+if [ ! -n "$BASH" ]; then
+  return
+fi
+
+# return if PW_PACKAGE_MANAGER is already set (avoid duplicated loading)
+if [[ -v PW_PACKAGE_MANAGER ]]; then
+  return
+fi
 
 # PM detection (from lib/ansible/module_utils/facts/system/pkg_mgr.py)
 # arg: <path> <format> <manager>

@@ -9,6 +9,13 @@ a consistent interface.
 ```
 curl -L https://raw.githubusercontent.com/hth2/pw/master/pw.sh -o /usr/local/bin/pw.sh
 echo 'source /usr/local/bin/pw.sh' >> /etc/bash.bashrc
+echo 'source /usr/local/bin/pw.sh' >> /etc/profile
+```
+* as root with wget:
+```
+wget https://raw.githubusercontent.com/hth2/pw/master/pw.sh -O /usr/local/bin/pw.sh
+echo 'source /usr/local/bin/pw.sh' >> /etc/bash.bashrc
+echo 'source /usr/local/bin/pw.sh' >> /etc/profile
 ```
 * as root with wget:
 ```
