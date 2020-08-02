@@ -5,9 +5,14 @@ pw aims to make use of different package managers easier by wrapping them to
 a consistent interface.
 
 ## Install
-* as root:
+* as root with curl:
 ```
 curl -L https://raw.githubusercontent.com/hth2/pw/master/pw.sh -o /usr/local/bin/pw.sh
+echo 'source /usr/local/bin/pw.sh' >> /etc/bash.bashrc
+```
+* as root with wget:
+```
+wget https://raw.githubusercontent.com/hth2/pw/master/pw.sh -O /usr/local/bin/pw.sh
 echo 'source /usr/local/bin/pw.sh' >> /etc/bash.bashrc
 ```
 * as regular user:
@@ -15,6 +20,13 @@ echo 'source /usr/local/bin/pw.sh' >> /etc/bash.bashrc
 curl -L https://raw.githubusercontent.com/hth2/pw/master/pw.sh -o ~/.pw.sh
 echo 'source ~/.pw.sh' >> ~/.bashrc
 ```
+
+## Update
+* this command will try to fetch the latest version of pw.sh from github
+```
+pw-self-update
+```
+
 
 ## Usage examples
 Let's say we are on a debian-like system. Instead of running `apt-get` and the

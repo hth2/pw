@@ -22,7 +22,8 @@ set_pw_platform /usr/bin/apt-get       deb     apt
 set_pw_platform /usr/bin/zypper        rpm     zypper
 # set_pw_platform /usr/sbin/urpmi        rpm     urpmi
 # set_pw_platform /usr/bin/pacman        not_set pacman
-# set_pw_platform /bin/opkg              not_set opkg
+set_pw_platform /bin/opkg              not_set opkg
+set_pw_platform /opt/bin/opkg          not_set opkg # on synology DS
 # set_pw_platform /usr/pkg/bin/pkgin     not_set pkgin
 # set_pw_platform /opt/local/bin/pkgin   not_set pkgin
 # set_pw_platform /opt/tools/bin/pkgin   not_set pkgin
@@ -40,8 +41,13 @@ set_pw_platform /usr/local/bin/brew    not_set homebrew
 # set_pw_platform /usr/sbin/sorcery      not_set sorcery
 # set_pw_platform /usr/bin/rpm-ostree    not_set atomic_container
 
-# use sudo if available
-SUDO=$(command -v sudo 2>/dev/null)
+
+# use sudo if availneeded and 
+if [ "$EUID" -ne 0 ]; then
+  SUDO=$(command -v sudo 2>/dev/null)
+else
+  SUDO=""
+fi
 
 run_cmd() {
   echo "$@"
@@ -115,6 +121,17 @@ apt)
     pw_versions()      { run_cmd apt-cache policy "$@"; }
     ;;
 
+opkg)
+# https://openwrt.org/docs/guide-user/additional-software/opkg
+    pw_install()       { run_cmd $SUDO opkg install "$@"; }
+    pw_remove()        { run_cmd $SUDO opkg remove "$@"; }
+    pw_update()        { run_cmd $SUDO opkg update; }
+    pw_list()          { run_cmd opkg list-installed; }
+    pw_info()          { run_cmd opkg info "$@"; }
+    pw_search()        { run_cmd opkg list | grep "$@"; }
+    ;;
+
+
 homebrew)
     pw_install()       { run_cmd brew install "$@"; }
     pw_remove()        { run_cmd brew remove "$@"; }
@@ -127,7 +144,7 @@ homebrew)
 
     pw_info()          { run_cmd brew info "$@"; }
     pw_file()          { run_cmd brew list --verbose "$@"; }
-    pw_list()          { run_cmd run_cmd brew list; }
+    pw_list()          { run_cmd brew list; }
     # https://stackoverflow.com/questions/19915683/how-to-find-package-for-installed-file-in-brew
     pw_own()           { run_cmd greadlink -f "$@"; } 
     ;;
@@ -152,6 +169,7 @@ zypper)
     echo "Error: 'PW_PACKAGE_MANAGER' is not supported yet!"
     exit 1
 esac
+
 
 
 alias pw-self-update='pw_self_update'
