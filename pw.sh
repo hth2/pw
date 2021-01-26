@@ -33,12 +33,12 @@ set_pw_platform /usr/bin/zypper        rpm     zypper
 # set_pw_platform /usr/bin/pacman        not_set pacman
 set_pw_platform /bin/opkg              not_set opkg
 set_pw_platform /opt/bin/opkg          not_set opkg # on synology DS
+set_pw_platform //sbin/apk             not_set apk # alpine linux
 # set_pw_platform /usr/pkg/bin/pkgin     not_set pkgin
 # set_pw_platform /opt/local/bin/pkgin   not_set pkgin
 # set_pw_platform /opt/tools/bin/pkgin   not_set pkgin
 # set_pw_platform /opt/local/bin/port    not_set macports
 set_pw_platform /usr/local/bin/brew    not_set homebrew
-# set_pw_platform /sbin/apk              not_set apk
 # set_pw_platform /usr/sbin/pkg          not_set pkgng
 # set_pw_platform /usr/sbin/swlist       not_set HP-UX
 # set_pw_platform /usr/bin/emerge        not_set portage
@@ -129,6 +129,26 @@ apt)
     pw_download()      { run_cmd apt-get install --download-only "$@"; }
     pw_versions()      { run_cmd apt-cache policy "$@"; }
     ;;
+
+apk)
+    pw_install()       { run_cmd $SUDO apk add "$@"; }
+    pw_remove()        { run_cmd $SUDO apk del "$@"; }
+    # pw_purge()         { run_cmd $SUDO apk --purge autoremove "$@"; }
+    pw_update()        { run_cmd $SUDO apk update; }
+    pw_upgrade()       { run_cmd $SUDO apk update && apk upgrade; }
+    pw_clean()         { run_cmd $SUDO apk cache clean; }
+    pw_info()          { run_cmd apt-cache show "$@"; }
+
+    pw_search()        { run_cmd apk search "$@*"; }
+    # pw_search_desc()   { run_cmd apt-cache search "$@"; }
+    # pw_search_file()   { run_cmd apt-file search "$@"; }
+
+    # pw_source()        { run_cmd apt-get source "$@"; }
+    # pw_builddep()      { run_cmd apt-get build-dep "$@"; }
+    # pw_download()      { run_cmd apt-get install --download-only "$@"; }
+    # pw_versions()      { run_cmd apt-cache policy "$@"; }
+    ;;
+
 
 opkg)
 # https://openwrt.org/docs/guide-user/additional-software/opkg
